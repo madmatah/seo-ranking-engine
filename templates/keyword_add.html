@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+
+{% block breadcrumb %}
+{{ block.super }}
+{% breadcrumb_url site.label site_url %}
+{% breadcrumb "New Keyword" %}
+{% endblock %}
+
+{% block content %}
+
+<div id="keyword_add_page">
+
+  <form method="post" action="{{form_action}}">
+
+    <fieldset>
+
+      <legend>Add a Keyword</legend>
+
+      <div class="inputFieldWrapper fieldWrapper">
+	<label for="label">{{form.keyword.label}}</label>
+	<div class="hint">e.g. buy a car</div>
+	{{ form.keyword }}
+	{{ form.keyword.errors }}
+      </div>
+
+      <div class="inputFieldWrapper fieldWrapper">
+	<label for="label">{{form.server.label}}</label>
+	{{form.server}}
+	{{form.server.errors}}
+      </div>
+
+      <button class="submit">Save</button>
+      <a href="{{site_url}}" id="add-website-cancel" class="button cancel">Cancel</a>
+
+    </fieldset>
+
+  </form>
+
+</div>
+
+{% endblock%}

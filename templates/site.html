@@ -1,0 +1,121 @@
+
+
+{% extends "layout.html" %}
+
+{% block breadcrumb %}
+{{ block.super }}
+{% breadcrumb site.label %}
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="dialog">
+</div>
+
+<div id="site_page">
+
+  <div id="delete_site">
+    <a class="button small red" href="{{site.delete_url}}">Delete {{site.label}}</a>
+  </div>
+
+  <h1>{{site.label}}</h1>
+  <div id="site_link">
+    <a href="{{site.url}}" rel="external">{{site.url}}</a>
+  </div>
+
+  {% if keywords|length %}
+
+  {% for keyword in keywords %}
+  <div class="keyword" id="keyword{{forloop.counter}}">
+  <h2 >{{keyword.keyword}} <a id="kw_graph_{{keyword.key}}" class="kw_graph" href="{{keyword.graph_url}}">&nbsp;</a></h2>
+
+  <table id="kw_se_report">
+    <tr>
+      <th class="kw_se">Search Engine</th>
+      <th class="kw_total">Total</th>
+      <th class="kw_rank">Rank</th>
+      <th class="kw_url">URL</th>
+      <th class="kw_date">Date</th>
+    </tr>
+
+    {% for kw_se in keyword.search_engines %}
+    <tr>
+      <td class="kw_se"><span class="search_engine {{kw_se.search_engine.icon}}">{{kw_se.search_engine.label}}</span></td>
+      <td class="kw_total">{{kw_se.last_log.total|default:"N/A"}}</td>
+      {% if kw_se.last_log %}
+      <td class="kw_rank">
+	{{kw_se.last_log.rank|default:">100"}}
+	<span class="variation_container">
+	  {% autoescape off %}
+	  {{kw_se.variation|variation}}
+	  {% endautoescape %}
+	</span>
+      </td>
+      <td class="kw_url">
+	{% if kw_se.last_log.url %}
+	<a href="{{kw_se.last_log.url}}" rel="external">{{kw_se.last_log.url|trunc:64}}</a>
+	{% else %}
+	N/A
+	{% endif %}
+      </td>
+      <td class="kw_date">{{kw_se.last_log.date|date}}</td>
+      {% else %}
+      <td class="kw_rank">N/A</td>
+      <td class="kw_url">N/A</td>
+      <td class="kw_date"><span class="scheduled">Scheduled</span></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+
+  <a class="button red small delete_keyword" href="{{keyword.delete_url}}">delete</a>
+  <span class="cleaner"></span>
+  </div>
+  <div class="cleaner"></div>
+
+  {% endfor %}
+
+  {% else %}
+  <p>You are not tracking any keyword at the moment.</p>
+  {% endif %}
+
+
+  {% ifnotequal remaining_keywords 0 %}
+  <p id="add_keyword">
+    <a class="button green" href="{{add_keyword_url}}">Add a keyword</a>
+  </p>
+  {% endifnotequal %}
+
+  <p class="backlink_container">
+    <a href="{% url 'home' %}">Back to the Dashboard</a>
+  </p>
+
+</div>
+
+
+<script type="text/javascript">
+$(function()
+{
+  $("a.kw_graph").click(function()
+  {
+    var dialogId = $(this).attr('id') + "_dialog";
+    var dialogUrl = $(this).attr('href');
+    var dialogTitle = $(this).parent().text();
+    var dialog = $("#" + dialogId);
+    if (dialog.length == 0) {
+      dialog = $('<div id="' + dialogId + '"></div>');
+      $("body").append(dialog);
+      dialog.load(dialogUrl).dialog({width: 650, height: 550, title: dialogTitle, modal: true});
+    }
+    else {
+      dialog.dialog('open');
+    }
+    return (false);
+  });
+
+});
+</script>
+
+{% endblock%}

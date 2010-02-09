@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block breadcrumb %}
+{{ block.super }}
+{% breadcrumb_url keyword.site.label keyword.site.report_url %}
+{% breadcrumb breadcrumb_label %}
+{% endblock %}
+
+
+{% block content %}
+
+<div id="keyword_delete_page">
+  <p>Do you really want to delete <strong>{{keyword.keyword|escape}}</strong> ?</p>
+
+  <form method="post" action="{{delete_url|escape}}">
+    <button class="submit">YES</button>
+    <a class="button cancel" href="{{keyword.site.report_url|escape}}">Cancel</a>
+  </form>
+
+
+</div>
+
+{% endblock%}

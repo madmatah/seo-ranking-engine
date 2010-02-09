@@ -1,0 +1,10 @@
+queue:
+
+- name: default
+  rate: 5/s
+  bucket_size: 10
+
+- name: search-engine-calls
+  rate: 1/s
+  bucket_size: 1
+

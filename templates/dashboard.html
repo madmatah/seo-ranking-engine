@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+
+<dl>
+  <dt>Your sites</dt>
+  <dd>
+    {% if sites|length %}
+      <ul>
+      {% for site in sites %}
+        <li><a href="/site/{{site.key}}">{{site.label}}</a></li>
+      {% endfor %}
+      </ul>
+    {% else %}
+    <p>You are not tracking any Website at the moment.</p>
+    {% endif %}
+    {% ifnotequal remaining_sites 0 %}
+    <p>
+      <a class="button green" href="{{add_site_url}}">Add a website</a>
+    </p>
+    {% endifnotequal %}
+  </dd>
+
+{% endblock%}

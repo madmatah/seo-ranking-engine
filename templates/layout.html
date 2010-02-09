@@ -1,0 +1,62 @@
+{% if not is_xhr %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    {% block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>{% block title %}{% endblock %}</title>
+    <link href="/static/blueprint/screen.css" rel="stylesheet" type="text/css" />
+    <link href="/static/jquery-ui-redmond.css" rel="stylesheet" type="text/css" />
+    <!--[if IE]> <link href="/static/blueprint/ie.css" media="screen,projection" rel="stylesheet" type="text/css" /><![endif]--> 
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("jquery", "1.4.1");
+      google.load("jqueryui", "1.7.2");
+    </script>
+    <script type="text/javascript" src="/static/js/jquery.flot.min.js"></script>
+    {% endblock %}
+  </head>
+  <body>
+    <div id="bodyWrapper">
+      <div id="topPanel">
+	{% block topnav %}
+	<ul>
+	  {% if user %}
+	  <li><a href="{{ logout_url }}">Logout</a></li>
+	  <li>{{user.email}}</li>
+	  {% if account %}
+	  <li id="quotas">Remaining Keywords : {{account.remaining_keywords}}/{{account.max_keyword}}&nbsp;&nbsp;-&nbsp;&nbsp;Sites: {{account.remaining_sites}}/{{account.max_site}}</li>
+	  {% endif %}
+	  {% else %}
+	  <li><a href="{{ login_url }}">Sign in</a></li>
+	  <li><a href="/signup">Signup</a></li>
+	  {% endif %}
+	</ul>
+	{% endblock %}
+	<span class="cleaner"></span>
+      </div>
+      <div id="bodyPanel">
+	<div id="breadcrumb">
+	  {% block breadcrumb %}
+	  {% breadcrumb_route "Home" "home" %}
+	  {% endblock %}
+	</div>
+	<div id="content">
+{% endif %}
+	  {% block content %}
+	  {% endblock %}
+{% if not is_xhr %}
+	</div>
+      </div>
+    </div>
+    <div id="footerPanel">
+      <div id="footerbodyPanel">
+	<ul>
+	  <li>Powered by <a href="http://www.buddingprojects.com/">SEO Ranking Engine</a></li>
+	</ul>
+      </div>
+    </div>
+  </body>
+</html>
+{% endif %}

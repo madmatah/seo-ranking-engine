@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+
+{% block breadcrumb %}
+{{ block.super }}
+{% breadcrumb "New Website" %}
+{% endblock %}
+
+{% block content %}
+
+<div id="site_add_page">
+
+  <form method="post" action="{{form_action}}">
+
+    <fieldset>
+
+      <legend>Add an URL to track</legend>
+
+      <div class="inputFieldWrapper fieldWrapper">
+	<label for="label">Name</label>
+	<div class="hint">e.g. My Example Website</div>
+	{{ form.label }}
+	{{ form.label.errors }}
+      </div>
+
+
+      <div class="inputFieldWrapper fieldWrapper">
+	<label for="label">URL</label>
+	<div class="hint">e.g. http://www.example-website.com/</div>
+	{{ form.url }}
+	{{ form.url.errors }}
+      </div>
+
+      <button class="submit">Save</button>
+      <a href="{{cancel_url}}" id="add-website-cancel" class="button cancel">Cancel</a>
+
+    </fieldset>
+
+  </form>
+
+</div>
+
+{% endblock%}

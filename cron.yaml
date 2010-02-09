@@ -1,0 +1,12 @@
+cron:
+- description: update rank stats
+  url: /tasks/update_ranks
+  schedule: every day 05:00
+
+- description: delete old logs
+  url: /tasks/delete/old_logs
+  schedule: every day 01:00
+
+- description: delete inactive accounts
+  url: /tasks/delete/inactive_accounts
+  schedule: every day 02:00

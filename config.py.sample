@@ -1,0 +1,125 @@
+#
+# Copyright 2010 Matthieu Huguet
+#
+# This file is part of SEO Ranking Engine.
+#
+# SEO Ranking Engine is free  software: you can redistribute it and/or
+# modify it under  the terms of the GNU  Lesser General Public License
+# as published  by the Free  Software Foundation, either version  3 of
+# the License, or (at your option) any later version.
+#
+# SEO  Ranking Engine  is  distributed in  the  hope that  it will  be
+# useful, but WITHOUT ANY  WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with SEO Ranking Engine.  If not, see
+# <http://www.gnu.org/licenses/>.
+
+import os
+
+# Google AJAX API Key (Recommended)
+# (Signup and get an API key at http://code.google.com/apis/ajaxsearch/signup.html )
+google_ajax_api_key = ""
+
+# Yahoo Search BOSS AppID (REQUIRED)
+# (Signup and get a BOSS AppID at http://developer.yahoo.com/boss )
+yahoo_boss_appid = ""
+
+# Bing AppID (REQUIRED)
+# (Signup and get a Bing AppID at http://bing.com/developers )
+bing_appid = ""
+
+# Authorize only administrators to signup
+admin_only = True
+
+# If True, each account need to be activated manually by am administrator
+moderate_signups = False
+
+# List of available search engines (see search_engine below for the identifiers)
+available_search_engines = [1, 2, 3, 4, 5, 6]
+
+# Quotas
+# default = 5 keywords
+max_keywords_per_user = 5
+# default = 2 sites
+max_sites_per_user = 2
+
+# Number of days to keep ranking data (0 = indefinitely)
+# default = 6 months
+data_retention_days = 182
+
+# Number of inactive days for an account to be deleted
+# default = delete account after 1 month of inactivity
+max_inactive_account_days = 31
+
+
+###########################################################################################################
+################ Don't edit the code below if you don't know exactly what you are doing ###################
+###########################################################################################################
+
+search_engines = {
+    1 : {
+        'label' : 'Google (AJAX Search API) - EN',
+        'type' : 'google-ajax-api',
+        'icon' : 'google',
+	'gl' : 'us'
+        },
+    2 : {
+        'label' : 'Google (AJAX Search API) - FR',
+        'type' : 'google-ajax-api',
+        'icon' : 'google',
+	'gl' : 'fr'
+        },
+    3 : {
+        'label' : 'Yahoo (en_US)',
+        'type' : 'yahoo-boss',
+        'icon' : 'yahoo',
+        'lang' : 'en',
+        'region' : 'us'
+        },
+    4 : {
+        'label' : 'Yahoo (fr_FR)',
+        'type' : 'yahoo-boss',
+        'icon' : 'yahoo',
+        'lang' : 'fr',
+        'region' : 'fr'
+        },
+    5 : {
+        'label' : 'Bing (en_US)',
+        'type' : 'bing-api',
+        'icon' : 'bing',
+        'market' : 'en-US'
+        },
+    6 : {
+        'label' : 'Bing (fr_FR)',
+        'type' : 'bing-api',
+        'icon' : 'bing',
+        'market' : 'fr-FR'
+        }
+}
+
+
+TEMPLATES_DIR =  os.path.join(os.path.dirname(__file__), 'templates')
+
+# Disable search on :
+#  - Yahoo! if yahoo_boss_appid is not specified
+#  - Bing if bing_appid is not specified
+try:
+    yahoo_boss_appid
+except:
+    yahoo_boss_appid = None
+try:
+    bing_appid
+except:
+    bing_appid = None
+se_filter = []
+for i in available_search_engines:
+    se = search_engines[i]
+    if se['type'] == 'yahoo-boss' and not yahoo_boss_appid:
+        se_filter.append(i)
+    elif se['type'] == 'bing-api' and not bing_appid:
+        se_filter.append(i)
+for i in se_filter:
+    available_search_engines.remove(i)

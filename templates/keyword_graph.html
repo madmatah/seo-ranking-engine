@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block breadcrumb %}
+{{ block.super }}
+{% breadcrumb_url keyword.site.label keyword.site.report_url %}
+{% breadcrumb keyword.keyword %}
+{% endblock %}
+
+{% block content %}
+
+<div id="legend_graph_{{keyword.key}}" style="display: inline-block" ></div>
+
+<div id="graph_{{keyword.key}}" class="graph_container" style="width: 600px; height: 400px;"></div>
+
+{% autoescape off %}
+<script type="text/javascript">
+$(function()
+{
+  var data = {{data}};
+  $.plot($("#graph_{{keyword.key}}"),
+	 data,
+	 {
+	   xaxis: {
+	     mode: "time",
+	     timeformat: "%y/%m/%d",
+	     min: {{seven_days_ago}},
+             max: {{now}}
+	   },
+	   yaxis: {
+	     max: 100,
+             min: 0
+	   },
+	   legend: {
+	     container : "#legend_graph_{{keyword.key}}",
+	     noColumns: 5
+	   },
+	   series: {
+	     points: {
+	       show: true
+	     },
+	     lines: {
+	       show: true
+	     }
+	   }
+	 });
+})
+
+</script>
+{% endautoescape %}
+
+
+{% endblock%}

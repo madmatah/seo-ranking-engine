@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block breadcrumb %}
+{{ block.super }}
+{% breadcrumb site.label %}
+{% endblock %}
+
+
+{% block content %}
+
+<div id="site_delete_page">
+  <p>Do you really want to delete <strong>{{site.label|escape}}</strong> ?</p>
+
+  <form method="post" action="{{delete_url|escape}}">
+    <button class="submit">YES</button>
+    <a class="button cancel" href="{{site.report_url|escape}}">Cancel</a>
+  </form>
+
+
+</div>
+
+{% endblock%}

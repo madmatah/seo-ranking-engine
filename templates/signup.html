@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div id="signup_page">
+
+  <h1>Sign Up for SEO Ranking Engine</h1>
+
+  <form action="{{form_action}}" method="post">
+
+    <textarea class="terms_box" disabled="disabled">{% include "terms.html" %}</textarea>
+
+    <div>
+      <input id="accept_terms_input" type="checkbox" name="accept_terms" value="1" />
+      <label for="accept_terms_input">I have read and agree with the terms of service (<a href="{% url "terms" %}">printable version</a>)</label>
+    </div>
+
+    {% if form_error %}
+    <div class="error">
+      {{ form_error}}
+    </div>
+    {% endif %}
+
+    <button class="submit" id="accept_button" name="accept">Create an account</button>
+
+  </form>
+
+</div>
+
+{% endblock %}
