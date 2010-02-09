@@ -69,7 +69,7 @@ def _google_ajax_api_ranking(url, keyword, server_info):
     num = 4
     for i in range(0, 16):
         start = i * num
-        api_url = base_api_url + "start=" + unicode(start) + "&q=" +  urllib.quote_plus(keyword)
+        api_url = base_api_url + "start=" + unicode(start) + "&q=" +  urllib.quote_plus(keyword.encode("UTF-8"))
         result = urlfetch_with_cache(api_url, 3600, 600)
         if result.status_code != 200:
             raise Exception("Invalid response (url = <" + google_url + ">, status code = " + unicode(result.status_code) + " and content = <" + unicode(result.content) + ">")
@@ -101,7 +101,7 @@ def _yahoo_boss_ranking(url, keyword, server_info):
     base_api_url = 'http://boss.yahooapis.com/ysearch/web/v1/'
 
     # Set keyword
-    base_api_url += urllib.quote_plus(keyword) + '?'
+    base_api_url += urllib.quote_plus(keyword.encode("UTF-8")) + '?'
 
     # Set AppID
     base_api_url += "appid=" + urllib.quote_plus(config.yahoo_boss_appid) + "&"
@@ -150,7 +150,7 @@ def _bing_api_ranking(url, keyword, server_info):
     base_api_url += "Market=" + server_info['market'] + "&"
 
     # Set keyword
-    base_api_url += "Query=" + urllib.quote_plus(keyword) + "&"
+    base_api_url += "Query=" + urllib.quote_plus(keyword.encode("UTF-8")) + "&"
 
     # Fetch 2x50 results and try to match url
     num = 50
