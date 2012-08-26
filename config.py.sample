@@ -23,13 +23,10 @@ import os
 # (Signup and get an API key at http://code.google.com/apis/ajaxsearch/signup.html )
 google_ajax_api_key = ""
 
-# Yahoo Search BOSS AppID (REQUIRED)
-# (Signup and get a BOSS AppID at http://developer.yahoo.com/boss )
-yahoo_boss_appid = ""
-
-# Bing AppID (REQUIRED)
-# (Signup and get a Bing AppID at http://bing.com/developers )
-bing_appid = ""
+# Windows Azure Marketplace account key (Required)
+# (Subscribe to Bing Search API - Web Results Only here :
+# https://datamarket.azure.com/dataset/8818F55E-2FE5-4CE3-A617-0B8BA8419F65 )
+azure_account_id = "4vbpXqSySjfYvoX663aqpQJEeg1kmNFYqWv3f9gqmZM="
 
 # Authorize only administrators to signup
 admin_only = True
@@ -38,7 +35,7 @@ admin_only = True
 moderate_signups = False
 
 # List of available search engines (see search_engine below for the identifiers)
-available_search_engines = [1, 2, 3, 4, 5, 6]
+available_search_engines = [1, 2, 5, 6]
 
 # Quotas
 # default = 5 keywords
@@ -72,20 +69,8 @@ search_engines = {
         'icon' : 'google',
 	'gl' : 'fr'
         },
-    3 : {
-        'label' : 'Yahoo (en_US)',
-        'type' : 'yahoo-boss',
-        'icon' : 'yahoo',
-        'lang' : 'en',
-        'region' : 'us'
-        },
-    4 : {
-        'label' : 'Yahoo (fr_FR)',
-        'type' : 'yahoo-boss',
-        'icon' : 'yahoo',
-        'lang' : 'fr',
-        'region' : 'fr'
-        },
+# Yahoo is deprecated, there is no API anymore since they joined bing
+# (old yahoo ids in this list : 3 and 4)
     5 : {
         'label' : 'Bing (en_US)',
         'type' : 'bing-api',
@@ -107,19 +92,15 @@ TEMPLATES_DIR =  os.path.join(os.path.dirname(__file__), 'templates')
 #  - Yahoo! if yahoo_boss_appid is not specified
 #  - Bing if bing_appid is not specified
 try:
-    yahoo_boss_appid
+    azure_account_id
 except:
-    yahoo_boss_appid = None
-try:
-    bing_appid
-except:
-    bing_appid = None
+    azure_account_id = None
 se_filter = []
 for i in available_search_engines:
     se = search_engines[i]
     if se['type'] == 'yahoo-boss' and not yahoo_boss_appid:
         se_filter.append(i)
-    elif se['type'] == 'bing-api' and not bing_appid:
+    elif se['type'] == 'bing-api' and not azure_account_id:
         se_filter.append(i)
 for i in se_filter:
     available_search_engines.remove(i)

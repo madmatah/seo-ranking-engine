@@ -24,7 +24,7 @@ import md5
 
 
 # URL fetcher function with caching system
-def urlfetch_with_cache(url, time, fail_time):
+def urlfetch_with_cache(url, time, fail_time, headers = {}):
     logging.info("urlfetch_with_cache(<" + unicode(url) + ">, " + unicode(time) + ", " +  unicode(fail_time) + ")")
     digest = md5.md5()
     digest.update('urlfetch:GET:' + url)
@@ -34,10 +34,14 @@ def urlfetch_with_cache(url, time, fail_time):
     if data is not None:
         return data
     else:
-        data = urlfetch.fetch(url)
+        data = urlfetch.fetch(url, headers = headers)
         if data.status_code == 200:
             cache_time = time
         else:
             cache_time = fail_time
-        memcache.add(cache_key, data, cache_time)
-        return data
+        cached_data = {
+            'status_code': data.status_code,
+            'content': data.content
+        }
+        memcache.add(cache_key, cached_data, cache_time)
+        return cached_data

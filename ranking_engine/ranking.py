@@ -21,6 +21,7 @@ import urllib
 import re
 import time
 import config
+import base64
 from django.utils import simplejson as json
 from utils import urlfetch_with_cache
 
@@ -35,7 +36,6 @@ def get_ranking(url, keyword, server):
 
     methods = {
         'google-ajax-api' : _google_ajax_api_ranking,
-        'yahoo-boss' : _yahoo_boss_ranking,
         'bing-api' : _bing_api_ranking,
         }
     method = methods.get(server_info['type'])
@@ -71,9 +71,9 @@ def _google_ajax_api_ranking(url, keyword, server_info):
         start = i * num
         api_url = base_api_url + "start=" + unicode(start) + "&q=" +  urllib.quote_plus(keyword.encode("UTF-8"))
         result = urlfetch_with_cache(api_url, 3600, 600)
-        if result.status_code != 200:
-            raise Exception("Invalid response (url = <" + google_url + ">, status code = " + unicode(result.status_code) + " and content = <" + unicode(result.content) + ">")
-        response = json.loads(result.content)
+        if result['status_code'] != 200:
+            raise Exception("Invalid response (url = <" + google_url + ">, status code = " + unicode(result['status_code']) + " and content = <" + unicode(result['content']) + ">")
+        response = json.loads(result['content'])
         if response.get('responseData'):
             if i == 0:
                 try:
@@ -91,88 +91,51 @@ def _google_ajax_api_ranking(url, keyword, server_info):
     return rank_infos
 
 
-
-# Fetch ranking with Yahoo Search BOSS
-def _yahoo_boss_ranking(url, keyword, server_info):
-    url_regex = re.compile("^" + url)
-    rank_infos = {}
-    counter = 0
-
-    base_api_url = 'http://boss.yahooapis.com/ysearch/web/v1/'
-
-    # Set keyword
-    base_api_url += urllib.quote_plus(keyword.encode("UTF-8")) + '?'
-
-    # Set AppID
-    base_api_url += "appid=" + urllib.quote_plus(config.yahoo_boss_appid) + "&"
-
-    # Set Format + Style
-    base_api_url += "format=json&style=raw&"
-
-    # Set language and region
-    base_api_url += "lang=" + server_info['lang'] + "&region=" + server_info['region'] + "&"
-
-    # Fetch 2x50 results and try to match url
-    num = 50
-    for i in range(0, 2):
-        start = i * num
-        api_url = base_api_url + "start=" + unicode(start) + "&count=" +  unicode(num)
-        result = urlfetch_with_cache(api_url, 3600, 600)
-        if result.status_code != 200:
-            raise Exception("Invalid response (url = <" + google_url + ">, status code = " + unicode(result.status_code) + " and content = <" + unicode(result.content) + ">")
-        response = json.loads(result.content)
-        if response.get('ysearchresponse'):
-            if i == 0:
-                rank_infos['total'] = long(response['ysearchresponse'].get('totalhits'))
-            results = response['ysearchresponse'].get('resultset_web')
-            if results:
-                for r in results:
-                    counter += 1
-                    if (url_regex.match(r['url'])):
-                        rank_infos['rank'] = counter
-                        rank_infos['url'] = r['url']
-                        return  rank_infos
-    return rank_infos
-
-
 # Fetch ranking with Bing API
 def _bing_api_ranking(url, keyword, server_info):
     url_regex = re.compile("^" + url)
     rank_infos = {}
     counter = 0
 
-    base_api_url = 'http://api.bing.net/json.aspx?Version=2.2&Sources=web&JsonType=raw&'
+    base_api_url = 'https://api.datamarket.azure.com/Data.ashx/Bing/SearchWeb/v1/Web?'
 
-    # Set AppID
-    base_api_url += "AppId=" + urllib.quote_plus(config.bing_appid) + "&"
+    # Set format
+    base_api_url += "$format=json&"
 
     # Set Market (language-region)
-    base_api_url += "Market=" + server_info['market'] + "&"
+    base_api_url += "Market=%27" + server_info['market'] + "%27&"
 
     # Set keyword
-    base_api_url += "Query=" + urllib.quote_plus(keyword.encode("UTF-8")) + "&"
+    base_api_url += "Query=%27" + urllib.quote_plus(keyword.encode("UTF-8")) + "%27&"
+
+
+    # Setup basic authentication
+    headers = {
+        "Authorization": "Basic %s" % base64.b64encode(":" + config.azure_account_id)
+    }
+    logging.info(headers)
 
     # Fetch 2x50 results and try to match url
     num = 50
     for i in range(0, 2):
         start = i * num
-        api_url = base_api_url + "Web.offset=" + unicode(start) + "&Web.count=" +  unicode(num)
-        result = urlfetch_with_cache(api_url, 3600, 600)
-        if result.status_code != 200:
-            raise Exception("Invalid response (url = <" + google_url + ">, status code = " + unicode(result.status_code) + " and content = <" + unicode(result.content) + ">")
-        response = json.loads(result.content)
-        if response.get('SearchResponse'):
-            web = response['SearchResponse'].get('Web')
-            if web:
-                if i == 0:
-                    rank_infos['total'] = long(web.get('Total'))
-                results = web.get('Results')
-                if results:
-                    for r in results:
-                        counter += 1
-                        if (url_regex.match(r['Url'])):
-                            rank_infos['rank'] = counter
-                            rank_infos['url'] = r['Url']
-                            return  rank_infos
+        api_url = base_api_url + "$skip=" + unicode(start) + "&$top=" +  unicode(num)
+        result = urlfetch_with_cache(api_url, 3600, 600, headers)
+        if result['status_code'] != 200:
+            raise Exception("Invalid response (url = <" + api_url + ">, status code = " + unicode(result['status_code']) + " and content = <" + unicode(result['content']) + ">")
+        response = json.loads(result['content'])
+        logging.info(response)
+        if response.get('d'):
+            results = response['d'].get('results')
+            if results:
+                # Total number of results is not available anymore via the API
+                rank_infos['total'] = None
+                for r in results:
+                    logging.info(r)
+                    counter += 1
+                    if (url_regex.match(r['Url'])):
+                        rank_infos['rank'] = counter
+                        rank_infos['url'] = r['Url']
+                        return  rank_infos
     return rank_infos
 
